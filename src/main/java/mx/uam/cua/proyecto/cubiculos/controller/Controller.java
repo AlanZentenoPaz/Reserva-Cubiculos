@@ -10,6 +10,9 @@ public class Controller {
     public String test() {
         return "API funcionando correctamente - Carlos Miguel Aguilar Chaparro";
     }
-
+    @GetMapping("/api/test1")
+    public String test() {
+        return "API funcionando correctamente - Alan Zenteno Paz";
+    }
 
 }
