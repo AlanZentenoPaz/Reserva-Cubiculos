@@ -1,30 +1,19 @@
-package mx.uam.cua.proyecto.cubiculos.entity;
+package mx.uam.cua.proyecto.cubiculos.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name="Sancion")
+public class SancionDTO {
 
-public class Sancion {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idSancion;
-
     private String motivo;
-
     private LocalDate fechaInicio;
-
     private LocalDate fechaFin;
-
     private String estado;
 
-    public Sancion() {
-    }
+    public SancionDTO(){}
 
-    public Sancion(Integer idSancion, String motivo, LocalDate fechaInicio,
-                   LocalDate fechaFin, String estado) {
+    public SancionDTO(Integer idSancion, String motivo,
+                      LocalDate fechaInicio, LocalDate fechaFin, String estado){
 
         this.idSancion = idSancion;
         this.motivo = motivo;
@@ -74,12 +63,4 @@ public class Sancion {
     }
 
 }
-
-
-
-
-
-
-
-
 
