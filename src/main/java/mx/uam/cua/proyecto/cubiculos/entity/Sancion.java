@@ -78,7 +78,9 @@ public class Sancion {
 
 
 
-dto - SancionDTO
+
+
+
 
 
 package mx.uam.cua.proyecto.cubiculos.dto;
