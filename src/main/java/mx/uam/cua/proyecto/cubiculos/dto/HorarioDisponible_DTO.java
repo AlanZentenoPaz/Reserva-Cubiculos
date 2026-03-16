@@ -1,27 +1,18 @@
-package mx.uam.cua.proyecto.cubiculos.entity;
+package mx.uam.cua.proyecto.cubiculos.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalTime;
 
-@Entity
-@Table(name="Horario_Disponible")
+public class HorarioDisponibleDTO {
 
-public class HorarioDisponible {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idHorario;
-
     private String diaSemana;
-
     private LocalTime horaInicio;
-
     private LocalTime horaFin;
 
-    public HorarioDisponible() {
+    public HorarioDisponibleDTO() {
     }
 
-    public HorarioDisponible(Integer idHorario, String diaSemana, LocalTime horaInicio, LocalTime horaFin) {
+    public HorarioDisponibleDTO(Integer idHorario, String diaSemana, LocalTime horaInicio, LocalTime horaFin) {
         this.idHorario = idHorario;
         this.diaSemana = diaSemana;
         this.horaInicio = horaInicio;
