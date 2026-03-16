@@ -29,7 +29,7 @@ public class Usuario {
     private String estado;
 
     public Usuario() {
-    }
+    } 
 
     public Usuario(Integer idUsuario, String matricula, String numeroEmpleado,
                    String nombre, String apellidoPaterno, String apellidoMaterno,
