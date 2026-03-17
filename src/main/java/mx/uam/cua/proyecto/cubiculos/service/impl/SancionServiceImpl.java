@@ -2,7 +2,9 @@ package mx.uam.cua.proyecto.cubiculos.service.impl;
 
 import mx.uam.cua.proyecto.cubiculos.dto.SancionDTO;
 import mx.uam.cua.proyecto.cubiculos.entity.Sancion;
+import mx.uam.cua.proyecto.cubiculos.entity.Usuario;
 import mx.uam.cua.proyecto.cubiculos.repository.SancionRepository;
+import mx.uam.cua.proyecto.cubiculos.repository.UsuarioRepository;
 import mx.uam.cua.proyecto.cubiculos.service.SancionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,10 @@ public class SancionServiceImpl implements SancionService {
     @Autowired
     private SancionRepository repository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    // 🔥 CONVERTIR ENTITY → DTO
     private SancionDTO convertirDTO(Sancion s){
 
         return new SancionDTO(
@@ -24,24 +30,35 @@ public class SancionServiceImpl implements SancionService {
                 s.getMotivo(),
                 s.getFechaInicio(),
                 s.getFechaFin(),
-                s.getEstado()
+                s.getEstado(),
+                s.getUsuario() != null ? s.getUsuario().getIdUsuario() : null
         );
     }
 
+    // 🔥 GUARDAR
     @Override
     public SancionDTO guardar(SancionDTO dto){
 
         Sancion s = new Sancion();
+
         s.setMotivo(dto.getMotivo());
         s.setFechaInicio(dto.getFechaInicio());
         s.setFechaFin(dto.getFechaFin());
         s.setEstado(dto.getEstado());
+
+        // 🔥 ASOCIAR USUARIO
+        if(dto.getIdUsuario() != null){
+            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            s.setUsuario(usuario);
+        }
 
         s = repository.save(s);
 
         return convertirDTO(s);
     }
 
+    // 🔥 OBTENER TODOS
     @Override
     public List<SancionDTO> obtener(){
 
@@ -51,35 +68,48 @@ public class SancionServiceImpl implements SancionService {
                 .collect(Collectors.toList());
     }
 
+    // 🔥 OBTENER POR ID
     @Override
     public SancionDTO obtenerPorId(Integer id){
 
-        Sancion s = repository.findById(id).orElseThrow();
+        Sancion s = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sanción no encontrada"));
 
         return convertirDTO(s);
     }
 
+    // 🔥 ACTUALIZAR
     @Override
     public SancionDTO actualizar(Integer id, SancionDTO dto){
 
-        Sancion s = repository.findById(id).orElseThrow();
+        Sancion s = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sanción no encontrada"));
 
         s.setMotivo(dto.getMotivo());
         s.setFechaInicio(dto.getFechaInicio());
         s.setFechaFin(dto.getFechaFin());
         s.setEstado(dto.getEstado());
 
-        repository.save(s);
+        // 🔥 ACTUALIZAR USUARIO
+        if(dto.getIdUsuario() != null){
+            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            s.setUsuario(usuario);
+        }
+
+        s = repository.save(s);
 
         return convertirDTO(s);
     }
 
+    // 🔥 ELIMINAR
     @Override
     public void eliminar(Integer id){
 
+        if(!repository.existsById(id)){
+            throw new RuntimeException("Sanción no encontrada");
+        }
+
         repository.deleteById(id);
-
     }
-
 }
-

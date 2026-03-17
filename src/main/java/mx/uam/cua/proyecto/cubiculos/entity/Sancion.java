@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name="Sancion")
-
+@Table(name="sancion") // 🔥 recomendable en minúsculas
 public class Sancion {
 
     @Id
@@ -20,17 +19,23 @@ public class Sancion {
 
     private String estado;
 
+    // 🔥 RELACIÓN
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
+
     public Sancion() {
     }
 
     public Sancion(Integer idSancion, String motivo, LocalDate fechaInicio,
-                   LocalDate fechaFin, String estado) {
+                   LocalDate fechaFin, String estado, Usuario usuario) {
 
         this.idSancion = idSancion;
         this.motivo = motivo;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.estado = estado;
+        this.usuario = usuario;
     }
 
     public Integer getIdSancion() {
@@ -73,13 +78,12 @@ public class Sancion {
         this.estado = estado;
     }
 
+    // 🔥 ESTO TE FALTABA
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }
-
-
-
-
-
-
-
-
-

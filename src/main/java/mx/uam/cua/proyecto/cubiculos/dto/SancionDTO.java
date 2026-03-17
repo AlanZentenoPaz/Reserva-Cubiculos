@@ -10,17 +10,24 @@ public class SancionDTO {
     private LocalDate fechaFin;
     private String estado;
 
+    private Integer idUsuario;
+
     public SancionDTO(){}
 
+    // 🔥 CONSTRUCTOR COMPLETO
     public SancionDTO(Integer idSancion, String motivo,
-                      LocalDate fechaInicio, LocalDate fechaFin, String estado){
+                      LocalDate fechaInicio, LocalDate fechaFin,
+                      String estado, Integer idUsuario){
 
         this.idSancion = idSancion;
         this.motivo = motivo;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.estado = estado;
+        this.idUsuario = idUsuario;
     }
+
+    // 🔹 GETTERS Y SETTERS
 
     public Integer getIdSancion() {
         return idSancion;
@@ -62,5 +69,12 @@ public class SancionDTO {
         this.estado = estado;
     }
 
-}
+    // 🔥 ESTE ES EL QUE TE FALTABA
+    public Integer getIdUsuario() {
+        return idUsuario;
+    }
 
+    public void setIdUsuario(Integer idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+}
