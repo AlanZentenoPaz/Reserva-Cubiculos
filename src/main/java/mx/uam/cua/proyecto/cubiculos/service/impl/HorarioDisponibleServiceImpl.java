@@ -1,9 +1,9 @@
 package mx.uam.cua.proyecto.cubiculos.service.impl;
 
-import mx.uam.reservas.dto.HorarioDisponibleDTO;
-import mx.uam.reservas.entity.HorarioDisponible;
-import mx.uam.reservas.repository.HorarioDisponibleRepository;
-import mx.uam.reservas.service.HorarioDisponibleService;
+import mx.uam.cua.proyecto.cubiculos.dto.HorarioDisponibleDTO;
+import mx.uam.cua.proyecto.cubiculos.entity.HorarioDisponible;
+import mx.uam.cua.proyecto.cubiculos.repository.HorarioDisponibleRepository;
+import mx.uam.cua.proyecto.cubiculos.service.HorarioDisponibleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

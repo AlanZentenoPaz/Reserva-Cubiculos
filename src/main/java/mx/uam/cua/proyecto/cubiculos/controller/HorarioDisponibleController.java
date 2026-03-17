@@ -1,7 +1,7 @@
 package mx.uam.cua.proyecto.cubiculos.controller;
 
-import mx.uam.reservas.dto.HorarioDisponibleDTO;
-import mx.uam.reservas.service.HorarioDisponibleService;
+import mx.uam.cua.proyecto.cubiculos.dto.HorarioDisponibleDTO;
+import mx.uam.cua.proyecto.cubiculos.service.HorarioDisponibleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

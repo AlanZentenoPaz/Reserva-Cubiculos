@@ -1,9 +1,9 @@
 package mx.uam.cua.proyecto.cubiculos.service.impl;
 
-import mx.uam.reservas.dto.SancionDTO;
-import mx.uam.reservas.entity.Sancion;
-import mx.uam.reservas.repository.SancionRepository;
-import mx.uam.reservas.service.SancionService;
+import mx.uam.cua.proyecto.cubiculos.dto.SancionDTO;
+import mx.uam.cua.proyecto.cubiculos.entity.Sancion;
+import mx.uam.cua.proyecto.cubiculos.repository.SancionRepository;
+import mx.uam.cua.proyecto.cubiculos.service.SancionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

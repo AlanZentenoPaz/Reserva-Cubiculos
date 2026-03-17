@@ -1,6 +1,6 @@
 package mx.uam.cua.proyecto.cubiculos.service;
 
-import mx.uam.reservas.dto.HorarioDisponibleDTO;
+import mx.uam.cua.proyecto.cubiculos.dto.HorarioDisponibleDTO;
 import java.util.List;
 
 public interface HorarioDisponibleService {

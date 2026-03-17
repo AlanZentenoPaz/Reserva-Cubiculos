@@ -1,6 +1,6 @@
 package mx.uam.cua.proyecto.cubiculos.service;
 
-import mx.uam.reservas.dto.SancionDTO;
+import mx.uam.cua.proyecto.cubiculos.dto.SancionDTO;
 import java.util.List;
 
 public interface SancionService {

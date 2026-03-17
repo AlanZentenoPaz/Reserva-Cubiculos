@@ -1,7 +1,7 @@
 package mx.uam.cua.proyecto.cubiculos.controller;
 
-import mx.uam.reservas.dto.SancionDTO;
-import mx.uam.reservas.service.SancionService;
+import mx.uam.cua.proyecto.cubiculos.dto.SancionDTO;
+import mx.uam.cua.proyecto.cubiculos.service.SancionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
