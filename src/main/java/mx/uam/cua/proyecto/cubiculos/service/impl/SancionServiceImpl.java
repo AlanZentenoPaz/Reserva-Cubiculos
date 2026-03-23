@@ -22,7 +22,6 @@ public class SancionServiceImpl implements SancionService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // 🔥 CONVERTIR ENTITY → DTO
     private SancionDTO convertirDTO(Sancion s){
 
         return new SancionDTO(
@@ -35,7 +34,6 @@ public class SancionServiceImpl implements SancionService {
         );
     }
 
-    // 🔥 GUARDAR
     @Override
     public SancionDTO guardar(SancionDTO dto){
 
@@ -58,7 +56,6 @@ public class SancionServiceImpl implements SancionService {
         return convertirDTO(s);
     }
 
-    // 🔥 OBTENER TODOS
     @Override
     public List<SancionDTO> obtener(){
 
@@ -68,7 +65,6 @@ public class SancionServiceImpl implements SancionService {
                 .collect(Collectors.toList());
     }
 
-    // 🔥 OBTENER POR ID
     @Override
     public SancionDTO obtenerPorId(Integer id){
 
@@ -78,7 +74,6 @@ public class SancionServiceImpl implements SancionService {
         return convertirDTO(s);
     }
 
-    // 🔥 ACTUALIZAR
     @Override
     public SancionDTO actualizar(Integer id, SancionDTO dto){
 
@@ -90,7 +85,6 @@ public class SancionServiceImpl implements SancionService {
         s.setFechaFin(dto.getFechaFin());
         s.setEstado(dto.getEstado());
 
-        // 🔥 ACTUALIZAR USUARIO
         if(dto.getIdUsuario() != null){
             Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -102,7 +96,6 @@ public class SancionServiceImpl implements SancionService {
         return convertirDTO(s);
     }
 
-    // 🔥 ELIMINAR
     @Override
     public void eliminar(Integer id){
 

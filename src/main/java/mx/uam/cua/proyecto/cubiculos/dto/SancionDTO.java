@@ -69,7 +69,6 @@ public class SancionDTO {
         this.estado = estado;
     }
 
-    // 🔥 ESTE ES EL QUE TE FALTABA
     public Integer getIdUsuario() {
         return idUsuario;
     }

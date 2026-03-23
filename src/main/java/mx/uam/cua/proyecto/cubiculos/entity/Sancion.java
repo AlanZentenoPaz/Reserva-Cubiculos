@@ -78,7 +78,6 @@ public class Sancion {
         this.estado = estado;
     }
 
-    // 🔥 ESTO TE FALTABA
     public Usuario getUsuario() {
         return usuario;
     }
