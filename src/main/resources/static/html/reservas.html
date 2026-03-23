@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Reservas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/reservas.css">
+</head>
+<body>
+<!-- Sidebar Navigation -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="bi bi-building me-2"></i>Sistema Cubículos</h3>
+        <p>Gestión de recursos universitarios</p>
+    </div>
+    <div class="sidebar-menu">
+        <div class="menu-item">
+            <a href="index.html">
+                <i class="bi bi-house-door"></i>
+                <span>Inicio</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="cubiculos.html">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <span>Cubículos</span>
+            </a>
+        </div>
+        <div class="menu-item active">
+            <a href="reservas.html">
+                <i class="bi bi-calendar-check"></i>
+                <span>Reservas</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="usuarios.html">
+                <i class="bi bi-people"></i>
+                <span>Usuarios</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="horarios.html">
+                <i class="bi bi-clock"></i>
+                <span>Horarios</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="sanciones.html">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>Sanciones</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="top-bar">
+        <h4 class="page-title">
+            <i class="bi bi-calendar-check"></i>
+            Gestión de Reservas
+        </h4>
+        <button class="btn btn-success" onclick="abrirModalCrear()">
+            <i class="bi bi-plus-circle me-2"></i>
+            Nueva Reserva
+        </button>
+    </div>
+
+    <!-- Tabla de reservas -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Cubículo</th>
+                        <th>Fecha</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                        <th>Motivo</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="reservasTableBody">
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Cargando reservas...</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar reserva -->
+<div class="modal fade" id="reservaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Nueva Reserva
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reservaForm">
+                    <input type="hidden" id="reservaId">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="idUsuario" class="form-label">
+                                <i class="bi bi-person me-2"></i>Usuario *
+                            </label>
+                            <select class="form-select" id="idUsuario" required>
+                                <option value="">Seleccione un usuario</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="idCubiculo" class="form-label">
+                                <i class="bi bi-building me-2"></i>Cubículo *
+                            </label>
+                            <select class="form-select" id="idCubiculo" required>
+                                <option value="">Seleccione un cubículo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="fechaReserva" class="form-label">
+                                <i class="bi bi-calendar-date me-2"></i>Fecha *
+                            </label>
+                            <input type="date" class="form-control" id="fechaReserva" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="horaInicio" class="form-label">
+                                <i class="bi bi-clock me-2"></i>Hora Inicio *
+                            </label>
+                            <input type="time" class="form-control" id="horaInicio" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="horaFin" class="form-label">
+                                <i class="bi bi-clock me-2"></i>Hora Fin *
+                            </label>
+                            <input type="time" class="form-control" id="horaFin" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label">
+                            <i class="bi bi-chat-text me-2"></i>Motivo
+                        </label>
+                        <textarea class="form-control" id="motivo" rows="3"
+                                  placeholder="Ej: Estudio en grupo, Proyecto final, etc."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-success" onclick="guardarReserva()">
+                    <i class="bi bi-save me-2"></i>Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar esta reserva?</p>
+                <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="confirmarEliminar()">
+                    <i class="bi bi-trash me-2"></i>Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../js/main.js"></script>
+<script src="../js/reservas.js"></script>
+</body>
+</html>
