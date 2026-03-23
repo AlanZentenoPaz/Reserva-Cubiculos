@@ -1,0 +1,42 @@
+/* Estilos específicos para usuarios */
+.badge-estudiante {
+    background-color: #cff4fc;
+    color: #055160;
+}
+
+.badge-profesor {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.badge-activo {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.badge-suspendido {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+/* Avatar de usuario */
+.user-avatar-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Tarjeta de información de usuario */
+.user-info-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
