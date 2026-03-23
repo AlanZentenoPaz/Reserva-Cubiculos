@@ -1,10 +1,386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Cubículos - Inicio</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .dashboard-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .card-icon {
+            font-size: 3rem;
+            padding: 20px;
+            text-align: center;
+        }
+        .card-stats {
+            padding: 15px;
+            background: rgba(0,0,0,0.03);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .quick-action-btn {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .quick-action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .recent-activity {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .activity-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
+<!-- Sidebar Navigation -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="bi bi-building me-2"></i>Sistema Cubículos</h3>
+        <p>Gestión de recursos universitarios</p>
+    </div>
+    <div class="sidebar-menu">
+        <div class="menu-item active">
+            <a href="index.html">
+                <i class="bi bi-house-door"></i>
+                <span>Inicio</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="cubiculos.html">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <span>Cubículos</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="reservas.html">
+                <i class="bi bi-calendar-check"></i>
+                <span>Reservas</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="usuarios.html">
+                <i class="bi bi-people"></i>
+                <span>Usuarios</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="horarios.html">
+                <i class="bi bi-clock"></i>
+                <span>Horarios</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="sanciones.html">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>Sanciones</span>
+            </a>
+        </div>
+    </div>
+</div>
 
+<!-- Main Content -->
+<div class="main-content">
+    <div class="top-bar">
+        <h4 class="page-title">
+            <i class="bi bi-house-door"></i>
+            Dashboard Principal
+        </h4>
+        <div class="user-info">
+            <span>Bienvenido, Administrador</span>
+            <div class="user-avatar">
+                <i class="bi bi-person"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2><i class="bi bi-emoji-smile me-2"></i>¡Bienvenido al Sistema!</h2>
+                <p class="mb-0">Gestiona de manera eficiente los cubículos, reservas, usuarios, horarios y sanciones desde un solo lugar.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="bi bi-building" style="font-size: 4rem;"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4" id="statsCards">
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card card">
+                <div class="card-icon" style="color: #667eea;">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                </div>
+                <div class="card-stats text-center">
+                    <div class="stat-number" id="totalCubiculos">0</div>
+                    <div class="text-muted">Cubículos Registrados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card card">
+                <div class="card-icon" style="color: #28a745;">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="card-stats text-center">
+                    <div class="stat-number" id="totalReservas">0</div>
+                    <div class="text-muted">Reservas Activas</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card card">
+                <div class="card-icon" style="color: #17a2b8;">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="card-stats text-center">
+                    <div class="stat-number" id="totalUsuarios">0</div>
+                    <div class="text-muted">Usuarios Registrados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="dashboard-card card">
+                <div class="card-icon" style="color: #dc3545;">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="card-stats text-center">
+                    <div class="stat-number" id="totalSanciones">0</div>
+                    <div class="text-muted">Sanciones Activas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-lightning me-2"></i>
+            Acciones Rápidas
+        </div>
+        <div class="card-body">
+            <div class="quick-actions">
+                <div class="quick-action-btn" onclick="window.location.href='cubiculos.html'">
+                    <i class="bi bi-plus-circle" style="font-size: 2rem; color: #667eea;"></i>
+                    <div class="mt-2">Nuevo Cubículo</div>
+                </div>
+                <div class="quick-action-btn" onclick="window.location.href='reservas.html'">
+                    <i class="bi bi-calendar-plus" style="font-size: 2rem; color: #28a745;"></i>
+                    <div class="mt-2">Nueva Reserva</div>
+                </div>
+                <div class="quick-action-btn" onclick="window.location.href='usuarios.html'">
+                    <i class="bi bi-person-plus" style="font-size: 2rem; color: #17a2b8;"></i>
+                    <div class="mt-2">Nuevo Usuario</div>
+                </div>
+                <div class="quick-action-btn" onclick="window.location.href='sanciones.html'">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: #dc3545;"></i>
+                    <div class="mt-2">Nueva Sanción</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="recent-activity">
+                <h5><i class="bi bi-calendar-week me-2"></i>Reservas Recientes</h5>
+                <div id="reservasRecientes">
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-hourglass-split"></i> Cargando...
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="recent-activity">
+                <h5><i class="bi bi-exclamation-circle me-2"></i>Sanciones Activas</h5>
+                <div id="sancionesActivas">
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-hourglass-split"></i> Cargando...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../js/main.js"></script>
+<script>
+    const API_BASE_URL = 'http://localhost:8080';
+
+    // Cargar estadísticas al iniciar
+    document.addEventListener('DOMContentLoaded', function() {
+        cargarEstadisticas();
+        cargarReservasRecientes();
+        cargarSancionesActivas();
+    });
+
+    async function cargarEstadisticas() {
+        try {
+            // Cargar cubículos
+            const cubiculosRes = await fetch(`${API_BASE_URL}/cubiculos`);
+            const cubiculos = await cubiculosRes.json();
+            document.getElementById('totalCubiculos').textContent = cubiculos.length;
+
+            // Cargar reservas
+            const reservasRes = await fetch(`${API_BASE_URL}/reservas`);
+            const reservas = await reservasRes.json();
+            const reservasActivas = reservas.filter(r => new Date(r.fechaReserva) >= new Date());
+            document.getElementById('totalReservas').textContent = reservasActivas.length;
+
+            // Cargar usuarios
+            const usuariosRes = await fetch(`${API_BASE_URL}/usuarios`);
+            const usuarios = await usuariosRes.json();
+            document.getElementById('totalUsuarios').textContent = usuarios.length;
+
+            // Cargar sanciones
+            const sancionesRes = await fetch(`${API_BASE_URL}/sanciones`);
+            const sanciones = await sancionesRes.json();
+            const sancionesActivas = sanciones.filter(s => s.estado === 'activa');
+            document.getElementById('totalSanciones').textContent = sancionesActivas.length;
+
+        } catch (error) {
+            console.error('Error cargando estadísticas:', error);
+        }
+    }
+
+    async function cargarReservasRecientes() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/reservas`);
+            const reservas = await response.json();
+            const reservasRecientes = reservas.slice(0, 5);
+
+            const container = document.getElementById('reservasRecientes');
+
+            if (reservasRecientes.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3">No hay reservas recientes</div>';
+                return;
+            }
+
+            container.innerHTML = reservasRecientes.map(reserva => `
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>Reserva #${reserva.idReserva}</strong>
+                            <div class="small text-muted">
+                                Cubículo ${reserva.idCubiculo} | ${formatearFecha(reserva.fechaReserva)}
+                                ${formatearHora(reserva.horaInicio)} - ${formatearHora(reserva.horaFin)}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+        } catch (error) {
+            console.error('Error cargando reservas recientes:', error);
+        }
+    }
+
+    async function cargarSancionesActivas() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/sanciones`);
+            const sanciones = await response.json();
+            const sancionesActivas = sanciones.filter(s => s.estado === 'activa').slice(0, 5);
+
+            const container = document.getElementById('sancionesActivas');
+
+            if (sancionesActivas.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3">No hay sanciones activas</div>';
+                return;
+            }
+
+            container.innerHTML = sancionesActivas.map(sancion => `
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>Usuario ID: ${sancion.idUsuario}</strong>
+                            <div class="small text-muted">
+                                ${sancion.motivo.substring(0, 60)}${sancion.motivo.length > 60 ? '...' : ''}
+                            </div>
+                            <div class="small text-danger">
+                                Vence: ${formatearFecha(sancion.fechaFin)}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+        } catch (error) {
+            console.error('Error cargando sanciones activas:', error);
+        }
+    }
+
+    function formatearFecha(fechaStr) {
+        if (!fechaStr) return 'N/A';
+        const fecha = new Date(fechaStr);
+        return fecha.toLocaleDateString('es-MX');
+    }
+
+    function formatearHora(horaStr) {
+        if (!horaStr) return 'N/A';
+        return horaStr.substring(0, 5);
+    }
+</script>
 </body>
 </html>
