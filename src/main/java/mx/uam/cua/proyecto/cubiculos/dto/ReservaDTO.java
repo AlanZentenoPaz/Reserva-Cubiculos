@@ -11,21 +11,23 @@ public class ReservaDTO {
     private LocalTime horaFin;
     private String estado;
     private Integer idCubiculo;
+    private Integer idUsuario;
 
     public ReservaDTO() {
     }
 
     public ReservaDTO(Integer idReserva, LocalDate fecha, LocalTime horaInicio,
-                      LocalTime horaFin, String estado, Integer idCubiculo) {
-
+                      LocalTime horaFin, String estado, Integer idCubiculo, Integer idUsuario) {
         this.idReserva = idReserva;
         this.fecha = fecha;
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
         this.estado = estado;
         this.idCubiculo = idCubiculo;
+        this.idUsuario = idUsuario;
     }
 
+    // Getters y Setters
     public Integer getIdReserva() {
         return idReserva;
     }
@@ -74,4 +76,11 @@ public class ReservaDTO {
         this.idCubiculo = idCubiculo;
     }
 
+    public Integer getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Integer idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 }

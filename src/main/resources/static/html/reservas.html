@@ -87,7 +87,7 @@
                         <th>Fecha</th>
                         <th>Hora Inicio</th>
                         <th>Hora Fin</th>
-                        <th>Motivo</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                     </thead>
@@ -144,10 +144,10 @@
 
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label for="fechaReserva" class="form-label">
+                            <label for="fecha" class="form-label">
                                 <i class="bi bi-calendar-date me-2"></i>Fecha *
                             </label>
-                            <input type="date" class="form-control" id="fechaReserva" required>
+                            <input type="date" class="form-control" id="fecha" required>
                         </div>
 
                         <div class="col-md-4 mb-3">
@@ -166,11 +166,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="motivo" class="form-label">
-                            <i class="bi bi-chat-text me-2"></i>Motivo
+                        <label for="estado" class="form-label">
+                            <i class="bi bi-toggle-on me-2"></i>Estado
                         </label>
-                        <textarea class="form-control" id="motivo" rows="3"
-                                  placeholder="Ej: Estudio en grupo, Proyecto final, etc."></textarea>
+                        <select class="form-select" id="estado">
+                            <option value="activa">Activa</option>
+                            <option value="cancelada">Cancelada</option>
+                            <option value="completada">Completada</option>
+                        </select>
                     </div>
                 </form>
             </div>

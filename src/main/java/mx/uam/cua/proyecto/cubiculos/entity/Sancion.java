@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name="sancion") // 🔥 recomendable en minúsculas
+@Table(name="sancion")
 public class Sancion {
 
     @Id
@@ -19,7 +19,7 @@ public class Sancion {
 
     private String estado;
 
-    // 🔥 RELACIÓN
+
     @ManyToOne
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;

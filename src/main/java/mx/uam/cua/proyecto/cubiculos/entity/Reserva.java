@@ -5,8 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name="Reserva")
-
+@Table(name = "Reserva")
 public class Reserva {
 
     @Id
@@ -22,23 +21,29 @@ public class Reserva {
     private String estado;
 
     @ManyToOne
-    @JoinColumn(name="idCubiculo")
+    @JoinColumn(name = "idCubiculo")
     private Cubiculo cubiculo;
+
+    // 🔥 AGREGAR RELACIÓN CON USUARIO
+    @ManyToOne
+    @JoinColumn(name = "idUsuario")
+    private Usuario usuario;
 
     public Reserva() {
     }
 
     public Reserva(Integer idReserva, LocalDate fecha, LocalTime horaInicio,
-                   LocalTime horaFin, String estado, Cubiculo cubiculo) {
-
+                   LocalTime horaFin, String estado, Cubiculo cubiculo, Usuario usuario) {
         this.idReserva = idReserva;
         this.fecha = fecha;
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
         this.estado = estado;
         this.cubiculo = cubiculo;
+        this.usuario = usuario;
     }
 
+    // Getters y Setters
     public Integer getIdReserva() {
         return idReserva;
     }
@@ -87,4 +92,11 @@ public class Reserva {
         this.cubiculo = cubiculo;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }

@@ -14,7 +14,6 @@ public class SancionDTO {
 
     public SancionDTO(){}
 
-    // 🔥 CONSTRUCTOR COMPLETO
     public SancionDTO(Integer idSancion, String motivo,
                       LocalDate fechaInicio, LocalDate fechaFin,
                       String estado, Integer idUsuario){
@@ -27,7 +26,7 @@ public class SancionDTO {
         this.idUsuario = idUsuario;
     }
 
-    // 🔹 GETTERS Y SETTERS
+    //GETTERS Y SETTERS
 
     public Integer getIdSancion() {
         return idSancion;

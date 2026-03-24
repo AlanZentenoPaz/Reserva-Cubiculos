@@ -19,9 +19,11 @@ async function cargarReservas() {
         if (!response.ok) throw new Error('Error al cargar reservas');
 
         const reservas = await response.json();
+        console.log('Reservas cargadas:', reservas);
         actualizarTabla(reservas);
 
     } catch (error) {
+        console.error('Error:', error);
         manejarError(error, 'No se pudieron cargar las reservas');
         mostrarErrorTabla();
     } finally {
@@ -37,19 +39,23 @@ async function cargarCubiculos() {
         const cubiculos = await response.json();
         const selectCubiculo = document.getElementById('idCubiculo');
 
-        selectCubiculo.innerHTML = '<option value="">Seleccione un cubículo</option>';
+        if (selectCubiculo) {
+            selectCubiculo.innerHTML = '<option value="">Seleccione un cubículo</option>';
 
-        cubiculos.forEach(cubiculo => {
-            if (cubiculo.estado === 'disponible') {
-                const option = document.createElement('option');
-                option.value = cubiculo.idCubiculo;
-                option.textContent = `${cubiculo.numeroCubiculo} - Cap: ${cubiculo.capacidad} - ${cubiculo.ubicacion}`;
-                selectCubiculo.appendChild(option);
-            }
-        });
+            cubiculos.forEach(cubiculo => {
+                // Mostrar todos los cubículos disponibles y en mantenimiento
+                if (cubiculo.estado === 'disponible' || cubiculo.estado === 'mantenimiento') {
+                    const option = document.createElement('option');
+                    option.value = cubiculo.idCubiculo;
+                    option.textContent = `${cubiculo.numeroCubiculo} - Cap: ${cubiculo.capacidad} - ${cubiculo.ubicacion} (${cubiculo.estado === 'disponible' ? 'Disponible' : 'En mantenimiento'})`;
+                    selectCubiculo.appendChild(option);
+                }
+            });
+        }
 
     } catch (error) {
         console.error('Error cargando cubículos:', error);
+        mostrarNotificacion('error', 'Error al cargar la lista de cubículos');
     }
 }
 
@@ -61,19 +67,23 @@ async function cargarUsuarios() {
         const usuarios = await response.json();
         const selectUsuario = document.getElementById('idUsuario');
 
-        selectUsuario.innerHTML = '<option value="">Seleccione un usuario</option>';
+        if (selectUsuario) {
+            selectUsuario.innerHTML = '<option value="">Seleccione un usuario</option>';
 
-        usuarios.forEach(usuario => {
-            if (usuario.estado === 'activo') {
-                const option = document.createElement('option');
-                option.value = usuario.idUsuario;
-                option.textContent = `${usuario.nombre} ${usuario.apellidoPaterno} - ${usuario.matricula || usuario.numeroEmpleado}`;
-                selectUsuario.appendChild(option);
-            }
-        });
+            usuarios.forEach(usuario => {
+                if (usuario.estado === 'activo') {
+                    const option = document.createElement('option');
+                    option.value = usuario.idUsuario;
+                    const identificador = usuario.matricula || usuario.numeroEmpleado || 'ID: ' + usuario.idUsuario;
+                    option.textContent = `${usuario.nombre} ${usuario.apellidoPaterno} - ${identificador}`;
+                    selectUsuario.appendChild(option);
+                }
+            });
+        }
 
     } catch (error) {
         console.error('Error cargando usuarios:', error);
+        mostrarNotificacion('error', 'Error al cargar la lista de usuarios');
     }
 }
 
@@ -95,40 +105,57 @@ function actualizarTabla(reservas) {
         return;
     }
 
-    tbody.innerHTML = reservas.map(reserva => `
-        <tr>
-            <td><span class="badge bg-secondary">${reserva.idReserva}</span></td>
-            <td><strong>Usuario ID: ${reserva.idUsuario}</strong></td>
-            <td><strong>Cubículo ID: ${reserva.idCubiculo}</strong></td>
-            <td>${formatearFecha(reserva.fechaReserva)}</td>
-            <td>${formatearHora(reserva.horaInicio)}</td>
-            <td>${formatearHora(reserva.horaFin)}</td>
-            <td>${reserva.motivo || 'Sin motivo'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="editarReserva(${reserva.idReserva})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="mostrarModalEliminar(${reserva.idReserva})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = reservas.map(reserva => {
+        // Determinar el badge de estado
+        let estadoBadge = '';
+        if (reserva.estado === 'activa') {
+            estadoBadge = '<span class="badge bg-success">Activa</span>';
+        } else if (reserva.estado === 'cancelada') {
+            estadoBadge = '<span class="badge bg-danger">Cancelada</span>';
+        } else if (reserva.estado === 'completada') {
+            estadoBadge = '<span class="badge bg-secondary">Completada</span>';
+        } else {
+            estadoBadge = '<span class="badge bg-info">' + (reserva.estado || 'Pendiente') + '</span>';
+        }
+
+        return `
+            <tr>
+                <td><span class="badge bg-secondary">${reserva.idReserva || 'N/A'}</span></td>
+                <td><strong>Usuario ID: ${reserva.idUsuario || 'N/A'}</strong></td>
+                <td><strong>Cubículo ID: ${reserva.idCubiculo || 'N/A'}</strong></td>
+                <td>${formatearFecha(reserva.fecha)}</td>
+                <td>${formatearHora(reserva.horaInicio)}</td>
+                <td>${formatearHora(reserva.horaFin)}</td>
+                <td>${estadoBadge}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editarReserva(${reserva.idReserva})" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="mostrarModalEliminar(${reserva.idReserva})" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function mostrarErrorTabla() {
     const tbody = document.getElementById('reservasTableBody');
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="8" class="text-center py-4">
-                <i class="bi bi-exclamation-triangle text-warning display-4 d-block mb-3"></i>
-                <h6 class="text-danger">Error al cargar los datos</h6>
-                <button class="btn btn-success btn-sm mt-2" onclick="cargarReservas()">
-                    <i class="bi bi-arrow-repeat me-2"></i>Reintentar
-                </button>
-            </td>
-        </tr>
-    `;
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-4">
+                    <i class="bi bi-exclamation-triangle text-warning display-4 d-block mb-3"></i>
+                    <h6 class="text-danger">Error al cargar los datos</h6>
+                    <p class="text-muted">Verifica que el backend esté corriendo en ${API_BASE_URL}</p>
+                    <button class="btn btn-success btn-sm mt-2" onclick="cargarReservas()">
+                        <i class="bi bi-arrow-repeat me-2"></i>Reintentar
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
 }
 
 async function guardarReserva() {
@@ -138,11 +165,13 @@ async function guardarReserva() {
     const reserva = {
         idUsuario: parseInt(document.getElementById('idUsuario').value),
         idCubiculo: parseInt(document.getElementById('idCubiculo').value),
-        fechaReserva: document.getElementById('fechaReserva').value,
+        fecha: document.getElementById('fecha').value,
         horaInicio: document.getElementById('horaInicio').value,
         horaFin: document.getElementById('horaFin').value,
-        motivo: document.getElementById('motivo').value
+        estado: document.getElementById('estado').value
     };
+
+    console.log('Guardando reserva:', reserva);
 
     try {
         const url = id ? `${API_RESERVAS}/${id}` : API_RESERVAS;
@@ -150,23 +179,31 @@ async function guardarReserva() {
 
         const response = await fetch(url, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify(reserva)
         });
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(errorText);
+            console.error('Error response:', errorText);
+            throw new Error(errorText || 'Error al guardar la reserva');
         }
 
-        const modal = bootstrap.Modal.getInstance(document.getElementById('reservaModal'));
-        modal.hide();
+        const result = await response.json();
+        console.log('Reserva guardada:', result);
 
-        mostrarNotificacion('success', id ? 'Reserva actualizada' : 'Reserva creada');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('reservaModal'));
+        if (modal) modal.hide();
+
+        mostrarNotificacion('success', id ? 'Reserva actualizada correctamente' : 'Reserva creada correctamente');
         cargarReservas();
         limpiarFormulario();
 
     } catch (error) {
+        console.error('Error:', error);
         manejarError(error, error.message || 'Error al guardar la reserva');
     }
 }
@@ -174,20 +211,20 @@ async function guardarReserva() {
 function validarFormulario() {
     const idUsuario = document.getElementById('idUsuario').value;
     const idCubiculo = document.getElementById('idCubiculo').value;
-    const fechaReserva = document.getElementById('fechaReserva').value;
+    const fecha = document.getElementById('fecha').value;
     const horaInicio = document.getElementById('horaInicio').value;
     const horaFin = document.getElementById('horaFin').value;
 
-    if (!idUsuario || !idCubiculo || !fechaReserva || !horaInicio || !horaFin) {
+    if (!idUsuario || !idCubiculo || !fecha || !horaInicio || !horaFin) {
         mostrarNotificacion('warning', 'Complete todos los campos obligatorios');
         return false;
     }
 
-    const fecha = new Date(fechaReserva);
+    const fechaObj = new Date(fecha);
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    if (fecha < hoy) {
+    if (fechaObj < hoy) {
         mostrarNotificacion('warning', 'No se pueden hacer reservas en fechas pasadas');
         return false;
     }
@@ -203,17 +240,21 @@ function validarFormulario() {
 async function editarReserva(id) {
     try {
         const response = await fetch(`${API_RESERVAS}/${id}`);
-        if (!response.ok) throw new Error('Error al obtener');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Error al obtener la reserva');
+        }
 
         const reserva = await response.json();
+        console.log('Editando reserva:', reserva);
 
         document.getElementById('reservaId').value = reserva.idReserva;
         document.getElementById('idUsuario').value = reserva.idUsuario;
         document.getElementById('idCubiculo').value = reserva.idCubiculo;
-        document.getElementById('fechaReserva').value = reserva.fechaReserva;
+        document.getElementById('fecha').value = reserva.fecha;
         document.getElementById('horaInicio').value = reserva.horaInicio;
         document.getElementById('horaFin').value = reserva.horaFin;
-        document.getElementById('motivo').value = reserva.motivo || '';
+        document.getElementById('estado').value = reserva.estado || 'activa';
 
         document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i>Editar Reserva';
 
@@ -221,7 +262,8 @@ async function editarReserva(id) {
         modal.show();
 
     } catch (error) {
-        manejarError(error, 'No se pudo cargar la reserva');
+        console.error('Error:', error);
+        manejarError(error, 'No se pudo cargar la información de la reserva');
     }
 }
 
@@ -235,35 +277,83 @@ async function confirmarEliminar() {
     if (!idEliminar) return;
 
     try {
-        const response = await fetch(`${API_RESERVAS}/${idEliminar}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Error al eliminar');
+        const response = await fetch(`${API_RESERVAS}/${idEliminar}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Error al eliminar la reserva');
+        }
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-        modal.hide();
+        if (modal) modal.hide();
 
-        mostrarNotificacion('success', 'Reserva eliminada');
+        mostrarNotificacion('success', 'Reserva eliminada correctamente');
         cargarReservas();
 
     } catch (error) {
-        manejarError(error, 'Error al eliminar la reserva');
+        console.error('Error:', error);
+        manejarError(error, error.message || 'Error al eliminar la reserva');
     } finally {
         idEliminar = null;
     }
 }
 
 function limpiarFormulario() {
-    document.getElementById('reservaForm').reset();
-    document.getElementById('reservaId').value = '';
-    document.getElementById('modalTitle').innerHTML = '<i class="bi bi-plus-circle me-2"></i>Nueva Reserva';
+    const form = document.getElementById('reservaForm');
+    if (form) form.reset();
 
+    const reservaId = document.getElementById('reservaId');
+    if (reservaId) reservaId.value = '';
+
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle) modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Nueva Reserva';
+
+    // Valores por defecto
     const hoy = new Date().toISOString().split('T')[0];
-    document.getElementById('fechaReserva').value = hoy;
-    document.getElementById('horaInicio').value = '09:00';
-    document.getElementById('horaFin').value = '10:00';
+    const fechaInput = document.getElementById('fecha');
+    if (fechaInput) fechaInput.value = hoy;
+
+    const horaInicio = document.getElementById('horaInicio');
+    if (horaInicio) horaInicio.value = '09:00';
+
+    const horaFin = document.getElementById('horaFin');
+    if (horaFin) horaFin.value = '10:00';
+
+    const estado = document.getElementById('estado');
+    if (estado) estado.value = 'activa';
 }
 
 function abrirModalCrear() {
     limpiarFormulario();
     const modal = new bootstrap.Modal(document.getElementById('reservaModal'));
     modal.show();
+}
+
+// Función auxiliar para formatear fecha
+function formatearFecha(fechaStr) {
+    if (!fechaStr) return 'N/A';
+    try {
+        const fecha = new Date(fechaStr);
+        return fecha.toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    } catch (e) {
+        return fechaStr;
+    }
+}
+
+// Función auxiliar para formatear hora
+function formatearHora(horaStr) {
+    if (!horaStr) return 'N/A';
+    if (typeof horaStr === 'string' && horaStr.length > 5) {
+        return horaStr.substring(0, 5);
+    }
+    return horaStr;
 }
