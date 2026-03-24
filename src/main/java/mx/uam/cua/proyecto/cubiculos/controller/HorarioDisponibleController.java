@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/horarios")
+@CrossOrigin(origins = "*")  // 🔥 AGREGAR ESTO
 
 public class HorarioDisponibleController {
 

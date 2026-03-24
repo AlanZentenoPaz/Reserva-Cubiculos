@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/cubiculos")
-
+@CrossOrigin(origins = "*")  // 🔥 AGREGAR ESTO
 public class CubiculoController {
 
     @Autowired

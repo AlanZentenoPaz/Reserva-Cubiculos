@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservas")
+@CrossOrigin(origins = "*")  // 🔥 AGREGAR ESTO
 
 public class ReservaController {
 

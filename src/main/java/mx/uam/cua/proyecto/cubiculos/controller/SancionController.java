@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/sanciones")
+@CrossOrigin(origins = "*")  // 🔥 AGREGAR ESTO
 
 public class SancionController {
 

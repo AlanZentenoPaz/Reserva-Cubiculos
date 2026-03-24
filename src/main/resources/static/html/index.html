@@ -10,15 +10,84 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../css/main.css">
     <style>
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-header h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .sidebar-header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.85rem;
+            margin: 5px 0 0;
+        }
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        .menu-item {
+            padding: 12px 25px;
+            margin: 5px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .menu-item a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+        }
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .menu-item.active {
+            background: rgba(255,255,255,0.2);
+        }
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .top-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
         .dashboard-card {
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
             border: none;
             border-radius: 15px;
             overflow: hidden;
+            background: white;
         }
         .dashboard-card:hover {
             transform: translateY(-10px);
@@ -32,6 +101,7 @@
         .card-stats {
             padding: 15px;
             background: rgba(0,0,0,0.03);
+            text-align: center;
         }
         .stat-number {
             font-size: 2rem;
@@ -66,6 +136,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
+            height: 100%;
         }
         .activity-item {
             padding: 10px 0;
@@ -81,6 +152,28 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        .error-card {
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .refresh-btn {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
@@ -137,6 +230,7 @@
         <h4 class="page-title">
             <i class="bi bi-house-door"></i>
             Dashboard Principal
+            <i class="bi bi-arrow-repeat refresh-btn ms-2" onclick="recargarTodosLosDatos()" style="font-size: 1rem; color: #0d6efd;" title="Recargar datos"></i>
         </h4>
         <div class="user-info">
             <span>Bienvenido, Administrador</span>
@@ -166,8 +260,8 @@
                 <div class="card-icon" style="color: #667eea;">
                     <i class="bi bi-grid-3x3-gap-fill"></i>
                 </div>
-                <div class="card-stats text-center">
-                    <div class="stat-number" id="totalCubiculos">0</div>
+                <div class="card-stats">
+                    <div class="stat-number" id="totalCubiculos">--</div>
                     <div class="text-muted">Cubículos Registrados</div>
                 </div>
             </div>
@@ -177,8 +271,8 @@
                 <div class="card-icon" style="color: #28a745;">
                     <i class="bi bi-calendar-check"></i>
                 </div>
-                <div class="card-stats text-center">
-                    <div class="stat-number" id="totalReservas">0</div>
+                <div class="card-stats">
+                    <div class="stat-number" id="totalReservas">--</div>
                     <div class="text-muted">Reservas Activas</div>
                 </div>
             </div>
@@ -188,8 +282,8 @@
                 <div class="card-icon" style="color: #17a2b8;">
                     <i class="bi bi-people"></i>
                 </div>
-                <div class="card-stats text-center">
-                    <div class="stat-number" id="totalUsuarios">0</div>
+                <div class="card-stats">
+                    <div class="stat-number" id="totalUsuarios">--</div>
                     <div class="text-muted">Usuarios Registrados</div>
                 </div>
             </div>
@@ -199,17 +293,23 @@
                 <div class="card-icon" style="color: #dc3545;">
                     <i class="bi bi-exclamation-triangle"></i>
                 </div>
-                <div class="card-stats text-center">
-                    <div class="stat-number" id="totalSanciones">0</div>
+                <div class="card-stats">
+                    <div class="stat-number" id="totalSanciones">--</div>
                     <div class="text-muted">Sanciones Activas</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Estado de conexión -->
+    <div id="connectionStatus" style="display: none;" class="error-card">
+        <i class="bi bi-wifi-off me-2"></i>
+        <strong>Error de conexión:</strong> No se pudo conectar con el servidor. Verifica que el backend esté corriendo en <code>http://localhost:8080</code>
+    </div>
+
     <!-- Quick Actions -->
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header bg-white">
             <i class="bi bi-lightning me-2"></i>
             Acciones Rápidas
         </div>
@@ -237,22 +337,24 @@
 
     <!-- Recent Activity -->
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 mb-3">
             <div class="recent-activity">
                 <h5><i class="bi bi-calendar-week me-2"></i>Reservas Recientes</h5>
                 <div id="reservasRecientes">
                     <div class="text-center text-muted py-3">
-                        <i class="bi bi-hourglass-split"></i> Cargando...
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        Cargando...
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 mb-3">
             <div class="recent-activity">
                 <h5><i class="bi bi-exclamation-circle me-2"></i>Sanciones Activas</h5>
                 <div id="sancionesActivas">
                     <div class="text-center text-muted py-3">
-                        <i class="bi bi-hourglass-split"></i> Cargando...
+                        <div class="spinner-border spinner-border-sm text-danger me-2" role="status"></div>
+                        Cargando...
                     </div>
                 </div>
             </div>
@@ -260,59 +362,117 @@
     </div>
 </div>
 
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="../js/main.js"></script>
 <script>
     const API_BASE_URL = 'http://localhost:8080';
 
-    // Cargar estadísticas al iniciar
-    document.addEventListener('DOMContentLoaded', function() {
-        cargarEstadisticas();
-        cargarReservasRecientes();
-        cargarSancionesActivas();
-    });
-
-    async function cargarEstadisticas() {
+    // Probar conexión con el backend
+    async function probarConexion() {
         try {
-            // Cargar cubículos
-            const cubiculosRes = await fetch(`${API_BASE_URL}/cubiculos`);
-            const cubiculos = await cubiculosRes.json();
-            document.getElementById('totalCubiculos').textContent = cubiculos.length;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            // Cargar reservas
-            const reservasRes = await fetch(`${API_BASE_URL}/reservas`);
-            const reservas = await reservasRes.json();
-            const reservasActivas = reservas.filter(r => new Date(r.fechaReserva) >= new Date());
-            document.getElementById('totalReservas').textContent = reservasActivas.length;
+            const response = await fetch(`${API_BASE_URL}/cubiculos`, {
+                method: 'HEAD',
+                signal: controller.signal
+            });
 
-            // Cargar usuarios
-            const usuariosRes = await fetch(`${API_BASE_URL}/usuarios`);
-            const usuarios = await usuariosRes.json();
-            document.getElementById('totalUsuarios').textContent = usuarios.length;
+            clearTimeout(timeoutId);
 
-            // Cargar sanciones
-            const sancionesRes = await fetch(`${API_BASE_URL}/sanciones`);
-            const sanciones = await sancionesRes.json();
-            const sancionesActivas = sanciones.filter(s => s.estado === 'activa');
-            document.getElementById('totalSanciones').textContent = sancionesActivas.length;
-
+            if (response.ok) {
+                document.getElementById('connectionStatus').style.display = 'none';
+                return true;
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
         } catch (error) {
-            console.error('Error cargando estadísticas:', error);
+            console.error('Error de conexión:', error);
+            document.getElementById('connectionStatus').style.display = 'block';
+            return false;
         }
     }
 
+    // Cargar estadísticas
+    async function cargarEstadisticas() {
+        try {
+            const conectado = await probarConexion();
+            if (!conectado) {
+                document.getElementById('totalCubiculos').textContent = '0';
+                document.getElementById('totalReservas').textContent = '0';
+                document.getElementById('totalUsuarios').textContent = '0';
+                document.getElementById('totalSanciones').textContent = '0';
+                return;
+            }
+
+            // Cargar cubículos
+            const cubiculosRes = await fetch(`${API_BASE_URL}/cubiculos`);
+            if (cubiculosRes.ok) {
+                const cubiculos = await cubiculosRes.json();
+                document.getElementById('totalCubiculos').textContent = cubiculos.length;
+                console.log('Cubículos cargados:', cubiculos.length);
+            } else {
+                document.getElementById('totalCubiculos').textContent = '0';
+            }
+
+            // Cargar reservas
+            const reservasRes = await fetch(`${API_BASE_URL}/reservas`);
+            if (reservasRes.ok) {
+                const reservas = await reservasRes.json();
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                const reservasActivas = reservas.filter(r => {
+                    const fechaReserva = new Date(r.fecha);
+                    return fechaReserva >= hoy && r.estado === 'activa';
+                });
+                document.getElementById('totalReservas').textContent = reservasActivas.length;
+                console.log('Reservas activas:', reservasActivas.length);
+            } else {
+                document.getElementById('totalReservas').textContent = '0';
+            }
+
+            // Cargar usuarios
+            const usuariosRes = await fetch(`${API_BASE_URL}/usuarios`);
+            if (usuariosRes.ok) {
+                const usuarios = await usuariosRes.json();
+                document.getElementById('totalUsuarios').textContent = usuarios.length;
+                console.log('Usuarios cargados:', usuarios.length);
+            } else {
+                document.getElementById('totalUsuarios').textContent = '0';
+            }
+
+            // Cargar sanciones
+            const sancionesRes = await fetch(`${API_BASE_URL}/sanciones`);
+            if (sancionesRes.ok) {
+                const sanciones = await sancionesRes.json();
+                const sancionesActivas = sanciones.filter(s => s.estado === 'activa');
+                document.getElementById('totalSanciones').textContent = sancionesActivas.length;
+                console.log('Sanciones activas:', sancionesActivas.length);
+            } else {
+                document.getElementById('totalSanciones').textContent = '0';
+            }
+
+        } catch (error) {
+            console.error('Error cargando estadísticas:', error);
+            document.getElementById('totalCubiculos').textContent = '0';
+            document.getElementById('totalReservas').textContent = '0';
+            document.getElementById('totalUsuarios').textContent = '0';
+            document.getElementById('totalSanciones').textContent = '0';
+        }
+    }
+
+    // Cargar reservas recientes
     async function cargarReservasRecientes() {
         try {
             const response = await fetch(`${API_BASE_URL}/reservas`);
-            const reservas = await response.json();
-            const reservasRecientes = reservas.slice(0, 5);
+            if (!response.ok) throw new Error('Error al cargar reservas');
 
+            const reservas = await response.json();
+            const reservasRecientes = reservas.slice(-5).reverse();
             const container = document.getElementById('reservasRecientes');
 
-            if (reservasRecientes.length === 0) {
-                container.innerHTML = '<div class="text-center text-muted py-3">No hay reservas recientes</div>';
+            if (!reservasRecientes || reservasRecientes.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3"><i class="bi bi-calendar-x"></i> No hay reservas registradas</div>';
                 return;
             }
 
@@ -324,7 +484,7 @@
                         <div class="flex-grow-1">
                             <strong>Reserva #${reserva.idReserva}</strong>
                             <div class="small text-muted">
-                                Cubículo ${reserva.idCubiculo} | ${formatearFecha(reserva.fechaReserva)}
+                                Cubículo ${reserva.idCubiculo} | ${formatearFecha(reserva.fecha)}
                                 ${formatearHora(reserva.horaInicio)} - ${formatearHora(reserva.horaFin)}
                             </div>
                         </div>
@@ -333,54 +493,118 @@
 
         } catch (error) {
             console.error('Error cargando reservas recientes:', error);
+            document.getElementById('reservasRecientes').innerHTML = '<div class="text-center text-danger py-3"><i class="bi bi-exclamation-triangle"></i> Error al cargar reservas</div>';
         }
     }
 
+    // Cargar sanciones activas
     async function cargarSancionesActivas() {
         try {
             const response = await fetch(`${API_BASE_URL}/sanciones`);
-            const sanciones = await response.json();
-            const sancionesActivas = sanciones.filter(s => s.estado === 'activa').slice(0, 5);
+            if (!response.ok) throw new Error('Error al cargar sanciones');
 
+            const sanciones = await response.json();
+            const sancionesActivas = sanciones.filter(s => s.estado === 'activa').slice(-5);
             const container = document.getElementById('sancionesActivas');
 
-            if (sancionesActivas.length === 0) {
-                container.innerHTML = '<div class="text-center text-muted py-3">No hay sanciones activas</div>';
+            if (!sancionesActivas || sancionesActivas.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3"><i class="bi bi-check-circle"></i> No hay sanciones activas</div>';
                 return;
             }
 
-            container.innerHTML = sancionesActivas.map(sancion => `
-                    <div class="activity-item">
-                        <div class="activity-icon" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
-                            <i class="bi bi-exclamation-triangle"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <strong>Usuario ID: ${sancion.idUsuario}</strong>
-                            <div class="small text-muted">
-                                ${sancion.motivo.substring(0, 60)}${sancion.motivo.length > 60 ? '...' : ''}
+            container.innerHTML = sancionesActivas.map(sancion => {
+                const fechaFin = new Date(sancion.fechaFin);
+                const hoy = new Date();
+                const diasRestantes = Math.ceil((fechaFin - hoy) / (1000 * 60 * 60 * 24));
+                let textoDias = '';
+                let claseDias = '';
+
+                if (diasRestantes < 0) {
+                    textoDias = 'Vencida';
+                    claseDias = 'text-danger';
+                } else if (diasRestantes === 0) {
+                    textoDias = 'Vence hoy';
+                    claseDias = 'text-warning';
+                } else {
+                    textoDias = `Vence en ${diasRestantes} día${diasRestantes !== 1 ? 's' : ''}`;
+                    claseDias = diasRestantes <= 3 ? 'text-warning' : 'text-muted';
+                }
+
+                return `
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                                <i class="bi bi-exclamation-triangle"></i>
                             </div>
-                            <div class="small text-danger">
-                                Vence: ${formatearFecha(sancion.fechaFin)}
+                            <div class="flex-grow-1">
+                                <strong>Usuario ID: ${sancion.idUsuario}</strong>
+                                <div class="small text-muted">
+                                    ${sancion.motivo ? sancion.motivo.substring(0, 60) + (sancion.motivo.length > 60 ? '...' : '') : 'Sin motivo'}
+                                </div>
+                                <div class="small ${claseDias}">
+                                    ${textoDias} (${formatearFecha(sancion.fechaFin)})
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+            }).join('');
 
         } catch (error) {
             console.error('Error cargando sanciones activas:', error);
+            document.getElementById('sancionesActivas').innerHTML = '<div class="text-center text-danger py-3"><i class="bi bi-exclamation-triangle"></i> Error al cargar sanciones</div>';
         }
+    }
+
+    // Recargar todos los datos
+    async function recargarTodosLosDatos() {
+        document.getElementById('totalCubiculos').textContent = '--';
+        document.getElementById('totalReservas').textContent = '--';
+        document.getElementById('totalUsuarios').textContent = '--';
+        document.getElementById('totalSanciones').textContent = '--';
+        document.getElementById('reservasRecientes').innerHTML = '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>Cargando...</div>';
+        document.getElementById('sancionesActivas').innerHTML = '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-danger me-2" role="status"></div>Cargando...</div>';
+
+        await cargarEstadisticas();
+        await cargarReservasRecientes();
+        await cargarSancionesActivas();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Datos actualizados',
+            text: 'Los datos del dashboard se han actualizado correctamente',
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 
     function formatearFecha(fechaStr) {
         if (!fechaStr) return 'N/A';
-        const fecha = new Date(fechaStr);
-        return fecha.toLocaleDateString('es-MX');
+        try {
+            const fecha = new Date(fechaStr);
+            return fecha.toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        } catch (e) {
+            return fechaStr;
+        }
     }
 
     function formatearHora(horaStr) {
         if (!horaStr) return 'N/A';
-        return horaStr.substring(0, 5);
+        if (typeof horaStr === 'string' && horaStr.length > 5) {
+            return horaStr.substring(0, 5);
+        }
+        return horaStr;
     }
+
+    // Inicializar el dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard inicializado');
+        cargarEstadisticas();
+        cargarReservasRecientes();
+        cargarSancionesActivas();
+    });
 </script>
 </body>
 </html>
