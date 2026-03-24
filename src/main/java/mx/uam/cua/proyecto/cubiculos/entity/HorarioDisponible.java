@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalTime;
 
 @Entity
-@Table(name="Horario_Disponible")
-
+@Table(name = "Horario_Disponible")
 public class HorarioDisponible {
 
     @Id
@@ -18,16 +17,24 @@ public class HorarioDisponible {
 
     private LocalTime horaFin;
 
+    // 🔥 RELACIÓN CON CUBÍCULO
+    @ManyToOne
+    @JoinColumn(name = "idCubiculo")
+    private Cubiculo cubiculo;
+
     public HorarioDisponible() {
     }
 
-    public HorarioDisponible(Integer idHorario, String diaSemana, LocalTime horaInicio, LocalTime horaFin) {
+    public HorarioDisponible(Integer idHorario, String diaSemana, LocalTime horaInicio,
+                             LocalTime horaFin, Cubiculo cubiculo) {
         this.idHorario = idHorario;
         this.diaSemana = diaSemana;
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
+        this.cubiculo = cubiculo;
     }
 
+    // Getters y Setters
     public Integer getIdHorario() {
         return idHorario;
     }
@@ -60,5 +67,11 @@ public class HorarioDisponible {
         this.horaFin = horaFin;
     }
 
-}
+    public Cubiculo getCubiculo() {
+        return cubiculo;
+    }
 
+    public void setCubiculo(Cubiculo cubiculo) {
+        this.cubiculo = cubiculo;
+    }
+}

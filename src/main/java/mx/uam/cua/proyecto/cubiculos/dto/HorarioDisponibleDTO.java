@@ -8,17 +8,21 @@ public class HorarioDisponibleDTO {
     private String diaSemana;
     private LocalTime horaInicio;
     private LocalTime horaFin;
+    private Integer idCubiculo;  // 🔥 Agregar idCubiculo
 
     public HorarioDisponibleDTO() {
     }
 
-    public HorarioDisponibleDTO(Integer idHorario, String diaSemana, LocalTime horaInicio, LocalTime horaFin) {
+    public HorarioDisponibleDTO(Integer idHorario, String diaSemana, LocalTime horaInicio,
+                                LocalTime horaFin, Integer idCubiculo) {
         this.idHorario = idHorario;
         this.diaSemana = diaSemana;
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
+        this.idCubiculo = idCubiculo;
     }
 
+    // Getters y Setters
     public Integer getIdHorario() {
         return idHorario;
     }
@@ -51,4 +55,11 @@ public class HorarioDisponibleDTO {
         this.horaFin = horaFin;
     }
 
+    public Integer getIdCubiculo() {
+        return idCubiculo;
+    }
+
+    public void setIdCubiculo(Integer idCubiculo) {
+        this.idCubiculo = idCubiculo;
+    }
 }

@@ -18,9 +18,11 @@ async function cargarHorarios() {
         if (!response.ok) throw new Error('Error al cargar horarios');
 
         const horarios = await response.json();
+        console.log('Horarios cargados:', horarios);
         actualizarTabla(horarios);
 
     } catch (error) {
+        console.error('Error:', error);
         manejarError(error, 'No se pudieron cargar los horarios');
         mostrarErrorTabla();
     } finally {
@@ -34,6 +36,8 @@ async function cargarCubiculos() {
         if (!response.ok) throw new Error('Error al cargar cubículos');
 
         cubiculosData = await response.json();
+        console.log('Cubículos cargados:', cubiculosData);
+
         const selectCubiculo = document.getElementById('idCubiculo');
 
         if (selectCubiculo) {
@@ -42,7 +46,7 @@ async function cargarCubiculos() {
             cubiculosData.forEach(cubiculo => {
                 const option = document.createElement('option');
                 option.value = cubiculo.idCubiculo;
-                option.textContent = `${cubiculo.numeroCubiculo} - ${cubiculo.ubicacion} (${cubiculo.tipo})`;
+                option.textContent = `${cubiculo.numeroCubiculo} - ${cubiculo.ubicacion} (Cap: ${cubiculo.capacidad}) - ${cubiculo.tipo}`;
                 selectCubiculo.appendChild(option);
             });
         }
@@ -74,15 +78,19 @@ function actualizarTabla(horarios) {
     }
 
     tbody.innerHTML = horarios.map(horario => {
+        // Buscar el cubículo por ID
         const cubiculo = cubiculosData.find(c => c.idCubiculo === horario.idCubiculo);
+        const numeroCubiculo = cubiculo ? cubiculo.numeroCubiculo : 'ID: ' + horario.idCubiculo;
+        const ubicacion = cubiculo ? cubiculo.ubicacion : '';
+
         const diaSemanaFormateado = formatearDiaSemana(horario.diaSemana);
 
         return `
             <tr>
                 <td><span class="badge bg-secondary">${horario.idHorario}</span></td>
                 <td>
-                    <strong>${cubiculo ? cubiculo.numeroCubiculo : 'ID: ' + horario.idCubiculo}</strong>
-                    <div class="small text-muted">${cubiculo ? cubiculo.ubicacion : ''}</div>
+                    <strong>${numeroCubiculo}</strong>
+                    <div class="small text-muted">${ubicacion}</div>
                 </td>
                 <td><span class="badge bg-primary">${diaSemanaFormateado}</span></td>
                 <td><i class="bi bi-clock me-1"></i>${formatearHora(horario.horaInicio)}</td>
@@ -113,6 +121,14 @@ function formatearDiaSemana(dia) {
     return dias[dia] || dia;
 }
 
+function formatearHora(horaStr) {
+    if (!horaStr) return 'N/A';
+    if (typeof horaStr === 'string' && horaStr.length > 5) {
+        return horaStr.substring(0, 5);
+    }
+    return horaStr;
+}
+
 function mostrarErrorTabla() {
     const tbody = document.getElementById('horariosTableBody');
     if (!tbody) return;
@@ -134,12 +150,21 @@ async function guardarHorario() {
     if (!validarFormulario()) return;
 
     const id = document.getElementById('horarioId').value;
+    const idCubiculo = document.getElementById('idCubiculo').value;
+
+    if (!idCubiculo) {
+        mostrarNotificacion('warning', 'Por favor seleccione un cubículo');
+        return;
+    }
+
     const horario = {
-        idCubiculo: parseInt(document.getElementById('idCubiculo').value),
+        idCubiculo: parseInt(idCubiculo),
         diaSemana: document.getElementById('diaSemana').value,
         horaInicio: document.getElementById('horaInicio').value,
         horaFin: document.getElementById('horaFin').value
     };
+
+    console.log('Guardando horario:', horario);
 
     try {
         const url = id ? `${API_HORARIOS}/${id}` : API_HORARIOS;
@@ -147,14 +172,21 @@ async function guardarHorario() {
 
         const response = await fetch(url, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify(horario)
         });
 
         if (!response.ok) {
             const errorText = await response.text();
+            console.error('Error response:', errorText);
             throw new Error(errorText || 'Error al guardar el horario');
         }
+
+        const result = await response.json();
+        console.log('Horario guardado:', result);
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('horarioModal'));
         if (modal) modal.hide();
@@ -175,35 +207,24 @@ function validarFormulario() {
     const horaInicio = document.getElementById('horaInicio').value;
     const horaFin = document.getElementById('horaFin').value;
 
-    if (!idCubiculo || !diaSemana || !horaInicio || !horaFin) {
-        mostrarNotificacion('warning', 'Complete todos los campos obligatorios');
+    if (!idCubiculo) {
+        mostrarNotificacion('warning', 'Seleccione un cubículo');
+        return false;
+    }
+
+    if (!diaSemana) {
+        mostrarNotificacion('warning', 'Seleccione un día de la semana');
+        return false;
+    }
+
+    if (!horaInicio || !horaFin) {
+        mostrarNotificacion('warning', 'Complete las horas de inicio y fin');
         return false;
     }
 
     if (horaInicio >= horaFin) {
         mostrarNotificacion('warning', 'La hora de inicio debe ser menor a la hora de fin');
         return false;
-    }
-
-    // Validar que no exista un horario duplicado para el mismo cubículo y día
-    const horaInicioNum = parseInt(horaInicio.replace(':', ''));
-    const horaFinNum = parseInt(horaFin.replace(':', ''));
-
-    // Esta validación se hace en el backend, pero podemos hacer una validación básica en frontend
-    // si tenemos los datos cargados
-    if (window.horariosExistentes && window.horariosExistentes.length > 0) {
-        const existeDuplicado = window.horariosExistentes.some(h =>
-            h.idCubiculo === parseInt(idCubiculo) &&
-            h.diaSemana === diaSemana &&
-            ((horaInicioNum >= parseInt(h.horaInicio.replace(':', '')) && horaInicioNum < parseInt(h.horaFin.replace(':', ''))) ||
-                (horaFinNum > parseInt(h.horaInicio.replace(':', '')) && horaFinNum <= parseInt(h.horaFin.replace(':', ''))) ||
-                (horaInicioNum <= parseInt(h.horaInicio.replace(':', '')) && horaFinNum >= parseInt(h.horaFin.replace(':', ''))))
-        );
-
-        if (existeDuplicado) {
-            mostrarNotificacion('warning', 'Ya existe un horario para este cubículo en el mismo día y horario');
-            return false;
-        }
     }
 
     return true;
@@ -215,6 +236,7 @@ async function editarHorario(id) {
         if (!response.ok) throw new Error('Error al obtener el horario');
 
         const horario = await response.json();
+        console.log('Editando horario:', horario);
 
         document.getElementById('horarioId').value = horario.idHorario;
         document.getElementById('idCubiculo').value = horario.idCubiculo;
@@ -288,88 +310,3 @@ function abrirModalCrear() {
     const modal = new bootstrap.Modal(document.getElementById('horarioModal'));
     modal.show();
 }
-
-// Función para filtrar horarios por cubículo
-function filtrarPorCubiculo(idCubiculo) {
-    if (!idCubiculo || idCubiculo === 'todos') {
-        cargarHorarios();
-        return;
-    }
-
-    fetch(API_HORARIOS)
-        .then(response => response.json())
-        .then(horarios => {
-            const filtrados = horarios.filter(h => h.idCubiculo === parseInt(idCubiculo));
-            actualizarTabla(filtrados);
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-// Función para filtrar horarios por día
-function filtrarPorDia(dia) {
-    if (!dia || dia === 'todos') {
-        cargarHorarios();
-        return;
-    }
-
-    fetch(API_HORARIOS)
-        .then(response => response.json())
-        .then(horarios => {
-            const filtrados = horarios.filter(h => h.diaSemana === dia);
-            actualizarTabla(filtrados);
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-// Función para exportar horarios a Excel (opcional)
-function exportarHorarios() {
-    fetch(API_HORARIOS)
-        .then(response => response.json())
-        .then(horarios => {
-            const datos = horarios.map(h => {
-                const cubiculo = cubiculosData.find(c => c.idCubiculo === h.idCubiculo);
-                return {
-                    'ID': h.idHorario,
-                    'Cubículo': cubiculo ? cubiculo.numeroCubiculo : h.idCubiculo,
-                    'Ubicación': cubiculo ? cubiculo.ubicacion : '',
-                    'Día': formatearDiaSemana(h.diaSemana),
-                    'Hora Inicio': h.horaInicio,
-                    'Hora Fin': h.horaFin
-                };
-            });
-
-            // Convertir a CSV
-            const headers = Object.keys(datos[0] || {});
-            const csv = [
-                headers.join(','),
-                ...datos.map(row => headers.map(header => JSON.stringify(row[header] || '')).join(','))
-            ].join('\n');
-
-            // Descargar archivo
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'horarios.csv');
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-
-            mostrarNotificacion('success', 'Horarios exportados correctamente');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            manejarError(error, 'Error al exportar los horarios');
-        });
-}
-
-
-
-
-
-
-
-
-
